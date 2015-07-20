@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
-  <display-name>customer</display-name>
+  <display-name>demo-admin</display-name>
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
     <welcome-file>index.htm</welcome-file>
@@ -11,7 +11,7 @@
   </welcome-file-list>
   <filter>
     <filter-name>Login Filter</filter-name>
-    <filter-class>org.fm.login.LoginFilter</filter-class>
+    <filter-class>org.demo.login.LoginFilter</filter-class>
     <init-param>
       <param-name>exceptPages</param-name>
       <param-value>register;login;logout;check;index;term-of-use;privacy-policy</param-value>
