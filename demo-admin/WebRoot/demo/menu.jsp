@@ -1,0 +1,1 @@
+<a href="stat-all.jsp">all</a> <a href="stat-cp.jsp">CP</a>
