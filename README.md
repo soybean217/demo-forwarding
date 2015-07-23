@@ -18,7 +18,7 @@ MAVEN
 mysql
 
 ## Usage
-### tomcat
+### tomcat configure
 Import existing project to eclipse .
 
 About project properties: Check java build path . Perhaps need modify pom.xml to refresh maven update . Perhaps need add Dynamic Web Module 3.0 and above Java 1.6 to Project Facets . 
@@ -39,9 +39,13 @@ demo-base -> WEB-INF/classes/base.jar
 
 Maven Dependencies -> WEB-INF/lib
 
+### mysql configure
+
 prepare mysql database with database.sql and grant user in src/config.properties 
 
 准备好mysql数据库，结构在database.sql文件中，账户资料配置在config.properties中。
+
+### test sample
 
 Admin project:
 http://site:port/demo-admin/demo/login.jsp
