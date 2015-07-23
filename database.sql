@@ -2,7 +2,8 @@
 SQLyog Community v11.1 (64 bit)
 MySQL - 5.5.41-MariaDB : Database - demo-forwarding
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -21,26 +22,32 @@ USE `demo-forwarding`;
 DROP TABLE IF EXISTS `base_users`;
 
 CREATE TABLE `base_users` (
-  `id` bigint(20) DEFAULT NULL,
-  `username` varchar(100) DEFAULT NULL,
-  `pwd` varchar(100) DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `id` BIGINT(20) DEFAULT NULL,
+  `username` VARCHAR(100) DEFAULT NULL,
+  `pwd` VARCHAR(100) DEFAULT NULL,
+  `email` VARCHAR(100) DEFAULT NULL
+) ENGINE=MYISAM DEFAULT CHARSET=utf8;
+
+/*Data for the table `base_users` */
+
+INSERT  INTO `base_users`(`id`,`username`,`pwd`,`email`) VALUES (1,'1@1.cn','c4ca4238a0b923820dcc509a6f75849b',NULL);
 
 /*Table structure for table `mm_records` */
 
 DROP TABLE IF EXISTS `mm_records`;
 
 CREATE TABLE `mm_records` (
-  `id` bigint(20) NOT NULL,
-  `imei` varchar(100) DEFAULT NULL,
-  `imsi` varchar(100) DEFAULT NULL,
+  `id` BIGINT(20) NOT NULL,
+  `imei` VARCHAR(100) DEFAULT NULL,
+  `imsi` VARCHAR(100) DEFAULT NULL,
   `cp_id` varchar(100) DEFAULT NULL,
   `charge_id` varchar(100) DEFAULT NULL,
   `content` varchar(8000) DEFAULT NULL,
   `ip` varchar(40) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+/*Data for the table `mm_records` */
 
 /*Table structure for table `receives` */
 
@@ -61,6 +68,8 @@ CREATE TABLE `receives` (
   `send_status` tinyint(4) DEFAULT NULL COMMENT '0:normal;-1:scale',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+/*Data for the table `receives` */
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
