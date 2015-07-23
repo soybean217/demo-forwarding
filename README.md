@@ -18,6 +18,7 @@ MAVEN
 mysql
 
 ## Usage
+### tomcat
 Import existing project to eclipse .
 
 About project properties: Check java build path . Perhaps need modify pom.xml to refresh maven update . Perhaps need add Dynamic Web Module 3.0 and above Java 1.6 to Project Facets . 
