@@ -12,6 +12,10 @@
   <filter>
     <filter-name>Login Filter</filter-name>
     <filter-class>org.demo.ReceiverFilter</filter-class>
+    <init-param>
+      <param-name>exceptPages</param-name>
+      <param-value>index</param-value>
+    </init-param>
   </filter>
   <filter-mapping>
     <filter-name>Login Filter</filter-name>
