@@ -1,3 +1,5 @@
 /demo-admin/target
 
 *.log
+*.war
+*.class
