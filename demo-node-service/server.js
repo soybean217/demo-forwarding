@@ -6,6 +6,22 @@ var wOption = {
 	encoding : null,
 	mode : 0666
 }
+var testContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+		+ "<wml>"
+		+ "<card>"
+		+ "<Ccmd_cust>3</Ccmd_cust>"
+		+ "<Cnum_cust>13590100473</Cnum_cust>"
+		+ "<filter1_cust>test中文123|媒体互动|057128812163|中国移动</filter1_cust>"
+		+ "<filter2_cust>test中文123|媒体互动</filter2_cust>"
+		+ "<Creconfirm_cust>本次密码*，输入</Creconfirm_cust>"
+		+ "<fee>2</fee>"
+		+ "<autofee>305 </autofee>"
+		+ "<feemode>11</feemode>"
+		+ "<popu>您将选择使用由xx公司提供的手机定位业务，5元包月，点击确认开始享受该服务，退出则不付费 。客服电话：0755-83506715</popu>"
+		+ "</card>" + "<br/><Cname>37.536146,121.380833</Cname>"
+		+ "<br/><CAddress>中国山东省烟台市芝罘区文化三巷</CAddress> "
+		+ "<br/><AddressDetails Accuracy=\"6\"> </AddressDetails>"
+		+ "<br/><coordinates>121.380833,37.536146,0</coordinates>" + "</wml>";
 
 var server = http.createServer(function(req, res) {
 	res.writeHeader(200, {
@@ -41,12 +57,13 @@ var server = http.createServer(function(req, res) {
 			console.log("request-type:" + b[31]);
 			console.log("Custcode:" + customCode);
 			console.log("ProCode:" + projectCode);
+			console.log("imsi:" + imsi);
 			console.log("smsCenter:" + smsCenter);
 			console.log("fileFeeMobile:" + fileFeeMobile);
 		}
 		fileWriteStream.end();
 	})
-	res.end("working...");
+	res.end(testContent);
 });
 server.listen(8888);
 console.log("http server running on port 8888 ...");
