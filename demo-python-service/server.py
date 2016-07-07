@@ -4,6 +4,7 @@ import tornado.ioloop
 import tornado.web
 import struct
 import torndb
+import time
 
 import config
 from Bastion import _test
@@ -58,13 +59,13 @@ def make_app():
 
 def get_test_response(_imsi_info):
     print(_imsi_info)
-#     db=torndb.Connection("localhost:3306","sms_service","root","1234")
-    db=torndb.Connection(config.GLOBAL_SETTINGS['config_db']['host'],config.GLOBAL_SETTINGS['config_db']['name'],config.GLOBAL_SETTINGS['config_db']['user'],config.GLOBAL_SETTINGS['config_db']['psw'])
+#     dbConfig=torndb.Connection("localhost:3306","sms_service","root","1234")
+    dbConfig=torndb.Connection(config.GLOBAL_SETTINGS['config_db']['host'],config.GLOBAL_SETTINGS['config_db']['name'],config.GLOBAL_SETTINGS['config_db']['user'],config.GLOBAL_SETTINGS['config_db']['psw'])
     sql = 'SELECT response FROM test_responses WHERE imsi = %s and testStatus=%s'
-    _recordRsp = db.get(sql, _imsi_info['imsi'],_imsi_info['testStatus'])
+    _recordRsp = dbConfig.get(sql, _imsi_info['imsi'],_imsi_info['testStatus'])
     if _recordRsp==None:
         sql = 'SELECT response FROM test_responses WHERE imsi = %s and testStatus=%s'
-        _recordRsp = db.get(sql,"def",_imsi_info['testStatus'])
+        _recordRsp = dbConfig.get(sql,"def",_imsi_info['testStatus'])
         print("get def:")
         print(_recordRsp)
     else:
@@ -75,10 +76,12 @@ def check_test_imsi(imsi):
     print(imsi);
     imsi=filter(str.isdigit, imsi)
     print(imsi);
-    db=torndb.Connection(config.GLOBAL_SETTINGS['config_db']['host'],config.GLOBAL_SETTINGS['config_db']['name'],config.GLOBAL_SETTINGS['config_db']['user'],config.GLOBAL_SETTINGS['config_db']['psw'])
+    dbConfig=torndb.Connection(config.GLOBAL_SETTINGS['config_db']['host'],config.GLOBAL_SETTINGS['config_db']['name'],config.GLOBAL_SETTINGS['config_db']['user'],config.GLOBAL_SETTINGS['config_db']['psw'])
     sql = 'SELECT imsi,testStatus FROM test_imsis WHERE imsi = %s'
-    #record = db.get(sql, "460020696666201")
-    _record = db.get(sql, imsi)
+    _record = dbConfig.get(sql, imsi)
+    dbLog=torndb.Connection(config.GLOBAL_SETTINGS['log_db']['host'],config.GLOBAL_SETTINGS['log_db']['name'],config.GLOBAL_SETTINGS['log_db']['user'],config.GLOBAL_SETTINGS['log_db']['psw'])
+    sql = 'insert into log_async_generals (`id`,`logId`,`para01`) values (%s,%s,%s)'
+    dbLog.insert(sql,time.time(),1,imsi)
     return _record
 
 if __name__ == "__main__":
