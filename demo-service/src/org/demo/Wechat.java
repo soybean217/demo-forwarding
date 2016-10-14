@@ -2,7 +2,6 @@ package org.demo;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -34,7 +33,6 @@ public class Wechat extends HttpServlet {
    *      response)
    */
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    doLogHeader(request);
     response.getWriter().print(request.getParameter("echostr"));
   }
 
@@ -43,7 +41,6 @@ public class Wechat extends HttpServlet {
    *      response)
    */
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    doLogHeader(request);
     printBodyString(request);
   }
 
@@ -57,26 +54,6 @@ public class Wechat extends HttpServlet {
     }
     String info = buffer.toString();
     LOG.debug(info);
-  }
-
-  private void doLogHeader(HttpServletRequest request) {
-    printHeader(request);
-  }
-
-  @SuppressWarnings("rawtypes")
-  private void printHeader(HttpServletRequest request) {
-    Enumeration names = request.getHeaderNames();
-    StringBuilder sb = new StringBuilder("headerInfo---");
-    while (names.hasMoreElements()) {
-      String name = names.nextElement().toString();
-      Enumeration headers = request.getHeaders(name);
-      sb.append(name).append(":");
-      while (headers.hasMoreElements()) {
-        sb.append(headers.nextElement()).append(" ");
-      }
-      sb.append("\n");
-    }
-    LOG.debug(sb.toString());
   }
 
 }

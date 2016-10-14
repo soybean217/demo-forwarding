@@ -55,7 +55,8 @@ public class ReceiverFilter implements Filter {
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
       ServletException {
     HttpServletRequest req = (HttpServletRequest) request;
-    LOG.debug(req.getRequestURI() + "?" + (req.getQueryString() != null ? req.getQueryString() : ""));
+    LOG.debug(req.getMethod() + ":" + req.getRequestURI() + "?"
+        + (req.getQueryString() != null ? req.getQueryString() : ""));
 
     if (req.getContentLength() > 0) {
       byte[] body = readBody(req);
