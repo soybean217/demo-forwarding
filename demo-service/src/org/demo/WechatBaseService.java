@@ -15,7 +15,11 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.common.util.ConnectionService;
+import org.demo.info.RspToken;
 import org.demo.info.WechatToken;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class WechatBaseService {
 
@@ -73,7 +77,10 @@ public class WechatBaseService {
 				result.setValidTime(rs.getLong("validTime"));
 				result.setSecret(rs.getString("secret"));
 				if (!result.isInValidTime()) {
-					throw new IllegalStateException("Wechat token expired .appID:" + appId);
+					processToken(result);
+					if (!result.isInValidTime()) {
+						throw new IllegalStateException("Wechat token expired .appID:" + appId);
+					}
 				}
 			} else {
 				throw new IllegalArgumentException("Can not find token of  appId:" + appId);
@@ -100,7 +107,20 @@ public class WechatBaseService {
 		return sendWechatInterface(url, null);
 	}
 
+	private void processToken(WechatToken wechatToken) throws SQLException, Exception {
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		Gson gson = gsonBuilder.create();
+		String rsp = getTokenFromWechat(wechatToken);
+		LOG.info("receive from tencent:" + rsp);
+		RspToken rspToken = gson.fromJson(rsp, RspToken.class);
+		if (rspToken.verify()) {
+			wechatToken.setValidTime(rspToken.getExpiresIn() * 1000 + System.currentTimeMillis());
+			rspToken.setAppId(wechatToken.getAppId());
+			rspToken.updateDb();
+		}
+	}
+
 	public static void main(String[] args) throws IllegalArgumentException, SQLException {
-		LOG.debug(WechatBaseService.getInstance().getToken(""));
+		LOG.debug(WechatBaseService.getInstance().getToken("wxb011e7747898ad8c"));
 	}
 }
