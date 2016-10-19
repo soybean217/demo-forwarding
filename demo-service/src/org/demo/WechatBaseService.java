@@ -57,7 +57,30 @@ public class WechatBaseService {
 		return result;
 	}
 
-	public WechatToken getToken(String appId) throws SQLException, IllegalArgumentException, IllegalStateException {
+	public WechatToken getAccessToken(String appId) throws Exception {
+		WechatToken result = getTokenFromDb(appId);
+		if (!result.isInValidTime()) {
+			processToken(result);
+			if (!result.isInValidTime()) {
+				throw new IllegalStateException("Wechat token expired .appID:" + appId);
+			}
+		}
+		return result;
+	}
+
+	public String getJsapiTicket(String appId) throws Exception {
+		WechatToken wechatToken = getAccessToken(appId);
+		if (!wechatToken.isJsapiTicketInValidTime()) {
+			processJsapiTicket(wechatToken);
+			if (!wechatToken.isJsapiTicketInValidTime()) {
+				throw new IllegalStateException("Wechat JsapiTicket expired .appID:" + appId);
+			}
+		}
+		return wechatToken.getJsapiTicket();
+	}
+
+	private WechatToken getTokenFromDb(String appId)
+			throws SQLException, IllegalArgumentException, IllegalStateException {
 		WechatToken result = new WechatToken();
 		PreparedStatement ps = null;
 		Connection con = null;
@@ -76,12 +99,8 @@ public class WechatBaseService {
 				result.setLastModTime(rs.getLong("lastModTime"));
 				result.setValidTime(rs.getLong("validTime"));
 				result.setSecret(rs.getString("secret"));
-				if (!result.isInValidTime()) {
-					processToken(result);
-					if (!result.isInValidTime()) {
-						throw new IllegalStateException("Wechat token expired .appID:" + appId);
-					}
-				}
+				result.setJsapiTicket(rs.getString("jsapiTicket"));
+				result.setJsapiTicketValidTime(rs.getLong("jsapiTicketValidTime"));
 			} else {
 				throw new IllegalArgumentException("Can not find token of  appId:" + appId);
 			}
@@ -101,26 +120,44 @@ public class WechatBaseService {
 		return result;
 	}
 
-	private String getTokenFromWechat(WechatToken wechatToken) throws ClientProtocolException, IOException {
+	private String getAccessTokenFromWechat(WechatToken wechatToken) throws ClientProtocolException, IOException {
 		String url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + wechatToken.getAppId()
 				+ "&secret=" + wechatToken.getSecret();
+		return sendWechatInterface(url, null);
+	}
+
+	private String getJsapiTicketFromWechat(WechatToken wechatToken) throws ClientProtocolException, IOException {
+		String url = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=" + wechatToken.getToken()
+				+ "&type=jsapi";
 		return sendWechatInterface(url, null);
 	}
 
 	private void processToken(WechatToken wechatToken) throws SQLException, Exception {
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		Gson gson = gsonBuilder.create();
-		String rsp = getTokenFromWechat(wechatToken);
+		String rsp = getAccessTokenFromWechat(wechatToken);
 		LOG.info("receive from tencent:" + rsp);
 		RspToken rspToken = gson.fromJson(rsp, RspToken.class);
 		if (rspToken.verify()) {
 			wechatToken.setValidTime(rspToken.getExpiresIn() * 1000 + System.currentTimeMillis());
-			rspToken.setAppId(wechatToken.getAppId());
-			rspToken.updateDb();
+			wechatToken.updateDb();
 		}
 	}
 
-	public static void main(String[] args) throws IllegalArgumentException, SQLException {
-		LOG.debug(WechatBaseService.getInstance().getToken("wxb011e7747898ad8c"));
+	private void processJsapiTicket(WechatToken wechatToken) throws SQLException, Exception {
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		Gson gson = gsonBuilder.create();
+		String rsp = getJsapiTicketFromWechat(wechatToken);
+		LOG.info("receive processJsapiTicket from tencent:" + rsp);
+		RspToken rspToken = gson.fromJson(rsp, RspToken.class);
+		if (rspToken.verify()) {
+			wechatToken.setJsapiTicketValidTime(rspToken.getExpiresIn() * 1000 + System.currentTimeMillis());
+			wechatToken.updateDb();
+		}
+	}
+
+	public static void main(String[] args) throws Exception {
+		// LOG.debug(WechatBaseService.getInstance().getAccessToken("wxb011e7747898ad8c"));
+		LOG.debug(WechatBaseService.getInstance().getJsapiTicket("wxb011e7747898ad8c"));
 	}
 }

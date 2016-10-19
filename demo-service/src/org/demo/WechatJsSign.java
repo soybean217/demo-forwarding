@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 public class WechatJsSign {
 
 	private final static Logger LOG = Logger.getLogger(WechatJsSign.class);
+	private String url = "";
 
 	public WechatJsSign() {
 		super();
@@ -22,9 +23,9 @@ public class WechatJsSign {
 	public static void main(String[] args) {
 		String jsapi_ticket = "jsapi_ticket";
 
-		String url = "http://example.com";
 		WechatJsSign wechatJsSign = new WechatJsSign();
-		Map<String, String> ret = wechatJsSign.sign(jsapi_ticket, url);
+		wechatJsSign.setUrl("http://xxx");
+		Map<String, String> ret = wechatJsSign.sign(jsapi_ticket, wechatJsSign.getUrl());
 		for (Map.Entry entry : ret.entrySet()) {
 			LOG.debug(entry.getKey() + ", " + entry.getValue());
 		}
@@ -76,6 +77,14 @@ public class WechatJsSign {
 
 	private String create_timestamp() {
 		return Long.toString(System.currentTimeMillis() / 1000);
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 }
