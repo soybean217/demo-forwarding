@@ -15,6 +15,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.common.util.ConnectionService;
+import org.demo.info.RspJsapiTicket;
 import org.demo.info.RspToken;
 import org.demo.info.WechatToken;
 
@@ -140,6 +141,7 @@ public class WechatBaseService {
 		RspToken rspToken = gson.fromJson(rsp, RspToken.class);
 		if (rspToken.verify()) {
 			wechatToken.setValidTime(rspToken.getExpiresIn() * 1000 + System.currentTimeMillis());
+			wechatToken.setToken(rspToken.getAccessToken());
 			wechatToken.updateDb();
 		}
 	}
@@ -149,9 +151,10 @@ public class WechatBaseService {
 		Gson gson = gsonBuilder.create();
 		String rsp = getJsapiTicketFromWechat(wechatToken);
 		LOG.info("receive processJsapiTicket from tencent:" + rsp);
-		RspToken rspToken = gson.fromJson(rsp, RspToken.class);
-		if (rspToken.verify()) {
-			wechatToken.setJsapiTicketValidTime(rspToken.getExpiresIn() * 1000 + System.currentTimeMillis());
+		RspJsapiTicket rspJsapiTicket = gson.fromJson(rsp, RspJsapiTicket.class);
+		if (rspJsapiTicket.verify()) {
+			wechatToken.setJsapiTicketValidTime(rspJsapiTicket.getExpiresIn() * 1000 + System.currentTimeMillis());
+			wechatToken.setJsapiTicket(rspJsapiTicket.getTicket());
 			wechatToken.updateDb();
 		}
 	}

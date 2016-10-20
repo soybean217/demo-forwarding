@@ -105,7 +105,7 @@ public class WechatToken {
 		LOG.info(this);
 		// String sql = "update `tbl_wechat_tokens` set
 		// token=?,nextTime=?,lastModTime=?,validTime=? where appId=?";
-		String sql = "update `tbl_wechat_tokens` set token=?,lastModTime=?,validTime=?,jsapiTicketValidTime=? where appId=?";
+		String sql = "update `tbl_wechat_tokens` set token=?,lastModTime=?,validTime=?,jsapiTicket=?,jsapiTicketValidTime=? where appId=?";
 		PreparedStatement ps = null;
 		Connection con = null;
 		ResultSet rs = null;
@@ -120,6 +120,7 @@ public class WechatToken {
 			// now);
 			ps.setLong(m++, now);
 			ps.setLong(m++, this.getValidTime());
+			ps.setString(m++, this.getJsapiTicket());
 			ps.setLong(m++, this.getJsapiTicketValidTime());
 			ps.setString(m++, appId);
 			if (ps.executeUpdate() == 0) {
