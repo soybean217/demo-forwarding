@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -19,6 +20,11 @@ import org.demo.info.RspJsapiTicket;
 import org.demo.info.RspToken;
 import org.demo.info.WechatToken;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -32,6 +38,22 @@ public class WechatBaseService {
 
 	public static WechatBaseService getInstance() {
 		return instance;
+	}
+
+	private static LoadingCache<String, WechatToken> cache;
+	static {
+		cache = CacheBuilder.newBuilder().maximumSize(20)// 设置大小，条目数
+				.expireAfterWrite(10, TimeUnit.SECONDS)// 设置失效时间，创建时间
+				.expireAfterAccess(20, TimeUnit.HOURS) // 设置时效时间，最后一次被访问
+				.removalListener(new RemovalListener<String, WechatToken>() { // 移除缓存的监听器
+					public void onRemoval(RemovalNotification<String, WechatToken> notification) {
+					}
+				}).build(new CacheLoader<String, WechatToken>() { // 通过回调加载缓存
+					@Override
+					public WechatToken load(String name) throws Exception {
+						return getTokenFromDb(name);
+					}
+				});
 	}
 
 	public String sendWechatInterface(String url, HttpEntity entity) throws ClientProtocolException, IOException {
@@ -59,7 +81,7 @@ public class WechatBaseService {
 	}
 
 	public WechatToken getAccessToken(String appId) throws Exception {
-		WechatToken result = getTokenFromDb(appId);
+		WechatToken result = cache.get(appId);
 		if (!result.isInValidTime()) {
 			processToken(result);
 			if (!result.isInValidTime()) {
@@ -80,8 +102,9 @@ public class WechatBaseService {
 		return wechatToken.getJsapiTicket();
 	}
 
-	private WechatToken getTokenFromDb(String appId)
+	private static WechatToken getTokenFromDb(String appId)
 			throws SQLException, IllegalArgumentException, IllegalStateException {
+		LOG.debug("get record from db:" + appId);
 		WechatToken result = new WechatToken();
 		PreparedStatement ps = null;
 		Connection con = null;
@@ -161,6 +184,7 @@ public class WechatBaseService {
 
 	public static void main(String[] args) throws Exception {
 		// LOG.debug(WechatBaseService.getInstance().getAccessToken("wxb011e7747898ad8c"));
+		LOG.debug(WechatBaseService.getInstance().getJsapiTicket("wxb011e7747898ad8c"));
 		LOG.debug(WechatBaseService.getInstance().getJsapiTicket("wxb011e7747898ad8c"));
 	}
 }
