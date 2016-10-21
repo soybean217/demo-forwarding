@@ -14,31 +14,34 @@ public class WechatJsSign {
 
 	private final static Logger LOG = Logger.getLogger(WechatJsSign.class);
 	private String url = "";
+	private String jsapiTicket = "";
+	private String appId = "";
+	private Map<String, String> ret;
 
 	public WechatJsSign() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public static void main(String[] args) {
-		String jsapi_ticket = "jsapi_ticket";
-
+	public static void main(String[] args) throws Exception {
 		WechatJsSign wechatJsSign = new WechatJsSign();
 		wechatJsSign.setUrl("http://xxx");
-		Map<String, String> ret = wechatJsSign.sign(jsapi_ticket, wechatJsSign.getUrl());
-		for (Map.Entry entry : ret.entrySet()) {
+		wechatJsSign.setAppId("wxb011e7747898ad8c");
+		wechatJsSign.sign();
+		for (Map.Entry entry : wechatJsSign.getRet().entrySet()) {
 			LOG.debug(entry.getKey() + ", " + entry.getValue());
 		}
 	};
 
-	public Map<String, String> sign(String jsapi_ticket, String url) {
-		Map<String, String> ret = new HashMap<String, String>();
+	public Map<String, String> sign() throws Exception {
+		jsapiTicket = WechatBaseService.getInstance().getJsapiTicket(appId);
+		ret = new HashMap<String, String>();
 		String nonce_str = create_nonce_str();
 		String timestamp = create_timestamp();
 		String string1;
 		String signature = "";
 
-		string1 = "jsapi_ticket=" + jsapi_ticket + "&noncestr=" + nonce_str + "&timestamp=" + timestamp + "&url=" + url;
+		string1 = "jsapi_ticket=" + jsapiTicket + "&noncestr=" + nonce_str + "&timestamp=" + timestamp + "&url=" + url;
 		LOG.debug(string1);
 
 		try {
@@ -53,10 +56,12 @@ public class WechatJsSign {
 		}
 
 		ret.put("url", url);
-		ret.put("jsapi_ticket", jsapi_ticket);
+		ret.put("jsapi_ticket", jsapiTicket);
 		ret.put("nonceStr", nonce_str);
 		ret.put("timestamp", timestamp);
 		ret.put("signature", signature);
+
+		LOG.debug(ret);
 
 		return ret;
 	}
@@ -85,6 +90,26 @@ public class WechatJsSign {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public Map<String, String> getRet() {
+		return ret;
+	}
+
+	public void setRet(Map<String, String> ret) {
+		this.ret = ret;
+	}
+
+	public String getAppId() {
+		return appId;
+	}
+
+	public void setAppId(String appId) {
+		this.appId = appId;
+	}
+
+	public String getJsapiTicket() {
+		return jsapiTicket;
 	}
 
 }
